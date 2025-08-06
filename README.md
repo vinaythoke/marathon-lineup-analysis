@@ -63,7 +63,7 @@ The infographic presents analysis of:
 2. Open the HTML file in your browser:
    ```bash
    cd marathon-lineup-analysis
-   open "LineUp Section Analysis - JBGSHHM2025.html"
+   open index.html
    ```
 
 3. Or serve it using a local server:
@@ -71,6 +71,27 @@ The infographic presents analysis of:
    python -m http.server 8000
    # Then visit http://localhost:8000
    ```
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+This project is optimized for Vercel deployment:
+
+1. Fork this repository
+2. Connect your GitHub account to [Vercel](https://vercel.com)
+3. Import the project - Vercel will automatically detect it as a static site
+4. Deploy with one click!
+
+The `index.html` file will be automatically served as the main page.
+
+### GitHub Pages
+Alternatively, you can deploy using GitHub Pages:
+
+1. Go to your repository settings
+2. Navigate to "Pages" section
+3. Select "Deploy from a branch"
+4. Choose "main" branch and "/ (root)" folder
+5. Your site will be available at `https://yourusername.github.io/marathon-lineup-analysis/`
 
 ## 📱 Browser Support
 
@@ -126,6 +147,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Live Demo**: [View the infographic](https://vinaythoke.github.io/marathon-lineup-analysis/)
+**Live Demo**: [View the infographic](https://marathon-lineup-analysis.vercel.app/)
+
+**GitHub Pages**: [Alternative link](https://vinaythoke.github.io/marathon-lineup-analysis/)
 
 *Built with ❤️ for the running community*
