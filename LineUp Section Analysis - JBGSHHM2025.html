@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marathon Runner Lineup Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+        }
+
+        * {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .glass-morphism {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+
+        .metric-card:hover::after {
+            animation: shimmer 1.5s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            transition: background-color 0.2s ease;
+        }
+
+        th {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-weight: 600;
+            color: #334155;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+
+        .highlight-elite {
+            border-left: 4px solid #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+        }
+
+        .highlight-a {
+            border-left: 4px solid #3b82f6;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+        }
+
+        .highlight-b {
+            border-left: 4px solid #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-circle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-circle:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-circle:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .8; }
+        }
+
+        .flow-line {
+            background: linear-gradient(90deg, transparent, #64748b, transparent);
+            height: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flow-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            animation: flow 3s linear infinite;
+        }
+
+        @keyframes flow {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 200px;
+            }
+        }
+
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+        }
+
+        .scroll-progress {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body class="text-slate-800 overflow-x-hidden">
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-progress" id="scrollProgress"></div>
+    </div>
+
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8 relative z-10">
+        
+        <header class="text-center mb-16" data-aos="fade-down" data-aos-duration="1000">
+            <div class="glass-morphism rounded-2xl p-8 mb-8">
+                <i class="fas fa-running text-6xl gradient-text mb-4 pulse-animation"></i>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black gradient-text mb-4">
+                    Runner Lineup Analysis
+                </h1>
+                <p class="mt-4 text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+                    An interactive infographic showcasing participant verification and section assignment for JBGSHHM 2025
+                </p>
+                <div class="mt-6 flex justify-center space-x-4">
+                    <span class="px-4 py-2 bg-white/20 rounded-full text-white/80 text-sm font-medium">
+                        <i class="fas fa-users mr-2"></i>2,966 Applicants
+                    </span>
+                    <span class="px-4 py-2 bg-white/20 rounded-full text-white/80 text-sm font-medium">
+                        <i class="fas fa-check-circle mr-2"></i>2,738 Verified
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Data Tables Section -->
+        <div class="mb-16" data-aos="fade-up" data-aos-duration="800">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    <i class="fas fa-table mr-3"></i>Raw Data Overview
+                </h2>
+                <div class="flow-line w-24 mx-auto mb-6"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Table 1 -->
+                <div class="card" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-users text-blue-500 mr-2"></i>
+                        <h3 class="font-bold text-slate-700">1. Total Applicants</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Category</th><th>Male</th><th>Female</th><th>Total</th></tr></thead>
+                            <tbody><tr><td class="font-medium">Dataset</td><td class="text-blue-600 font-semibold">2,692</td><td class="text-pink-600 font-semibold">274</td><td class="text-slate-800 font-bold">2,966</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Table 2 -->
+                <div class="card" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        <h3 class="font-bold text-slate-700">2. Auto Verified</h3>
+                    </div>
+                     <div class="table-container">
+                        <table>
+                            <thead><tr><th>Category</th><th>Male</th><th>Female</th><th>Total</th></tr></thead>
+                            <tbody><tr><td class="font-medium">Verified</td><td class="text-blue-600 font-semibold">2,267</td><td class="text-pink-600 font-semibold">228</td><td class="text-slate-800 font-bold">2,495</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Table 3 -->
+                <div class="card" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                        <h3 class="font-bold text-slate-700">3. Failed Verification</h3>
+                    </div>
+                     <div class="table-container">
+                        <table>
+                            <thead><tr><th>Category</th><th>Male</th><th>Female</th><th>Total</th></tr></thead>
+                            <tbody><tr><td class="font-medium">Failed</td><td class="text-blue-600 font-semibold">425</td><td class="text-pink-600 font-semibold">46</td><td class="text-slate-800 font-bold">471</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Table 4 -->
+                <div class="card" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-crown text-amber-500 mr-2"></i>
+                        <h3 class="font-bold text-slate-700">4. Final: Section 'Elite'</h3>
+                    </div>
+                     <div class="table-container">
+                        <table>
+                            <thead><tr><th>Category</th><th>Male</th><th>Female</th><th>Total</th></tr></thead>
+                            <tbody><tr><td class="font-medium">Elite</td><td class="text-blue-600 font-semibold">126</td><td class="text-pink-600 font-semibold">13</td><td class="text-slate-800 font-bold">139</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Table 5 -->
+                <div class="card" data-aos="zoom-in" data-aos-delay="500">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-medal text-blue-500 mr-2"></i>
+                        <h3 class="font-bold text-slate-700">5. Final: Section 'A'</h3>
+                    </div>
+                     <div class="table-container">
+                        <table>
+                            <thead><tr><th>Category</th><th>Male</th><th>Female</th><th>Total</th></tr></thead>
+                            <tbody><tr><td class="font-medium">Section A</td><td class="text-blue-600 font-semibold">778</td><td class="text-pink-600 font-semibold">50</td><td class="text-slate-800 font-bold">828</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Table 6 -->
+                <div class="card" data-aos="zoom-in" data-aos-delay="600">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-award text-emerald-500 mr-2"></i>
+                        <h3 class="font-bold text-slate-700">6. Final: Section 'B'</h3>
+                    </div>
+                     <div class="table-container">
+                        <table>
+                            <thead><tr><th>Category</th><th>Male</th><th>Female</th><th>Total</th></tr></thead>
+                            <tbody><tr><td class="font-medium">Section B</td><td class="text-blue-600 font-semibold">1,583</td><td class="text-pink-600 font-semibold">188</td><td class="text-slate-800 font-bold">1,771</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Table 7 -->
+                <div class="card" data-aos="zoom-in" data-aos-delay="700">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-arrow-right text-orange-500 mr-2"></i>
+                        <h3 class="font-bold text-slate-700">7. Moved to Section 'C'</h3>
+                    </div>
+                     <div class="table-container">
+                        <table>
+                            <thead><tr><th>Category</th><th>Male</th><th>Female</th><th>Total</th></tr></thead>
+                            <tbody><tr><td class="font-medium">Section C</td><td class="text-blue-600 font-semibold">205</td><td class="text-pink-600 font-semibold">23</td><td class="text-slate-800 font-bold">228</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Table 8 -->
+                <div class="card" data-aos="zoom-in" data-aos-delay="800">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-user-check text-purple-500 mr-2"></i>
+                        <h3 class="font-bold text-slate-700">8. Manual Verification</h3>
+                    </div>
+                     <div class="table-container">
+                        <table>
+                            <thead><tr><th>Category</th><th>Male</th><th>Female</th><th>Total</th></tr></thead>
+                            <tbody><tr><td class="font-medium">Manual OK</td><td class="text-blue-600 font-semibold">220</td><td class="text-pink-600 font-semibold">23</td><td class="text-slate-800 font-bold">243</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="mb-16" data-aos="fade-up" data-aos-duration="1000">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    <i class="fas fa-trophy mr-3"></i>Final Verified Runners by Section
+                </h2>
+                <div class="flow-line w-32 mx-auto"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card highlight-elite text-center metric-card" data-aos="flip-left" data-aos-delay="100">
+                    <div class="relative">
+                        <i class="fas fa-crown text-4xl text-amber-500 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-amber-600 mb-2">Elite Section</h3>
+                        <p class="text-6xl md:text-7xl font-black text-slate-800 my-6 pulse-animation">139</p>
+                        <div class="flex justify-center items-center space-x-4 text-slate-600">
+                            <span class="flex items-center">
+                                <i class="fas fa-male text-blue-500 mr-1"></i>
+                                <span class="font-semibold">126</span>
+                            </span>
+                            <span class="text-slate-400">|</span>
+                            <span class="flex items-center">
+                                <i class="fas fa-female text-pink-500 mr-1"></i>
+                                <span class="font-semibold">13</span>
+                            </span>
+                        </div>
+                        <div class="mt-4 text-sm text-slate-500">
+                            <span class="px-3 py-1 bg-amber-100 rounded-full">Top Performers</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card highlight-a text-center metric-card" data-aos="flip-left" data-aos-delay="200">
+                    <div class="relative">
+                        <i class="fas fa-medal text-4xl text-blue-500 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-blue-600 mb-2">Section A</h3>
+                        <p class="text-6xl md:text-7xl font-black text-slate-800 my-6 pulse-animation">828</p>
+                        <div class="flex justify-center items-center space-x-4 text-slate-600">
+                            <span class="flex items-center">
+                                <i class="fas fa-male text-blue-500 mr-1"></i>
+                                <span class="font-semibold">778</span>
+                            </span>
+                            <span class="text-slate-400">|</span>
+                            <span class="flex items-center">
+                                <i class="fas fa-female text-pink-500 mr-1"></i>
+                                <span class="font-semibold">50</span>
+                            </span>
+                        </div>
+                        <div class="mt-4 text-sm text-slate-500">
+                            <span class="px-3 py-1 bg-blue-100 rounded-full">Advanced Runners</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card highlight-b text-center metric-card" data-aos="flip-left" data-aos-delay="300">
+                    <div class="relative">
+                        <i class="fas fa-award text-4xl text-emerald-500 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-emerald-600 mb-2">Section B</h3>
+                        <p class="text-6xl md:text-7xl font-black text-slate-800 my-6 pulse-animation">1,771</p>
+                        <div class="flex justify-center items-center space-x-4 text-slate-600">
+                            <span class="flex items-center">
+                                <i class="fas fa-male text-blue-500 mr-1"></i>
+                                <span class="font-semibold">1,583</span>
+                            </span>
+                            <span class="text-slate-400">|</span>
+                            <span class="flex items-center">
+                                <i class="fas fa-female text-pink-500 mr-1"></i>
+                                <span class="font-semibold">188</span>
+                            </span>
+                        </div>
+                        <div class="mt-4 text-sm text-slate-500">
+                            <span class="px-3 py-1 bg-emerald-100 rounded-full">Main Group</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-16" data-aos="fade-up" data-aos-duration="1000">
+            <div class="lg:col-span-2 card" data-aos="slide-right" data-aos-delay="100">
+                <div class="flex items-center justify-center mb-6">
+                    <i class="fas fa-chart-pie text-2xl text-slate-700 mr-3"></i>
+                    <h3 class="text-xl font-bold text-slate-900">Final Lineup Distribution</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="lineupChart"></canvas>
+                </div>
+            </div>
+            <div class="lg:col-span-3 card" data-aos="slide-left" data-aos-delay="200">
+                <div class="flex items-center justify-center mb-6">
+                    <i class="fas fa-chart-bar text-2xl text-slate-700 mr-3"></i>
+                    <h3 class="text-xl font-bold text-slate-900">Gender Distribution by Section</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Verification Process Flow -->
+        <div class="mb-16" data-aos="fade-up" data-aos-duration="1000">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    <i class="fas fa-sitemap mr-3"></i>Verification Process Overview
+                </h2>
+                <div class="flow-line w-40 mx-auto"></div>
+            </div>
+            <div class="card" data-aos="zoom-in" data-aos-delay="200">
+                <div class="flex flex-col items-center">
+                    <!-- Start -->
+                    <div class="bg-sky-100 border-2 border-sky-500 rounded-lg p-4 text-center shadow-md">
+                        <p class="font-bold text-sky-800">Total Applicants for Elite, A & B</p>
+                        <p class="text-2xl font-extrabold text-sky-900">2,966</p>
+                    </div>
+                    <div class="h-12 w-1 bg-slate-300 my-2"></div>
+                    
+                    <!-- Verification Split -->
+                    <div class="bg-slate-100 rounded-lg p-4 text-center">
+                        <p class="font-bold text-slate-700">Verification Process</p>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row w-full justify-center items-start md:items-center mt-4">
+                        <!-- Left Path: Failed -->
+                        <div class="flex-1 flex flex-col items-center px-4">
+                            <div class="h-12 w-1 bg-slate-300 rotate-45 hidden md:block"></div>
+                            <div class="bg-red-100 border-2 border-red-400 rounded-lg p-4 text-center shadow-md w-full max-w-sm">
+                                <p class="font-bold text-red-800">Initial Failed Verification</p>
+                                <p class="text-2xl font-extrabold text-red-900">471</p>
+                            </div>
+                            <div class="h-12 w-1 bg-slate-300 my-2"></div>
+                             <div class="flex flex-col md:flex-row w-full justify-center items-start md:items-center mt-2 space-y-4 md:space-y-0 md:space-x-4">
+                                <div class="bg-rose-100 border-2 border-rose-500 rounded-lg p-3 text-center shadow w-full">
+                                    <p class="font-semibold text-rose-800">Moved to Section C</p>
+                                    <p class="text-xl font-bold text-rose-900">228</p>
+                                </div>
+                                <div class="bg-orange-100 border-2 border-orange-500 rounded-lg p-3 text-center shadow w-full">
+                                    <p class="font-semibold text-orange-800">System Error (Re-verified)</p>
+                                    <p class="text-xl font-bold text-orange-900">243</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Path: Verified -->
+                        <div class="flex-1 flex flex-col items-center px-4 mt-8 md:mt-0">
+                             <div class="h-12 w-1 bg-slate-300 -rotate-45 hidden md:block"></div>
+                            <div class="bg-green-100 border-2 border-green-500 rounded-lg p-4 text-center shadow-md w-full max-w-sm">
+                                <p class="font-bold text-green-800">Total Verified Runners</p>
+                                <p class="text-sm text-green-700">(Auto + Manual)</p>
+                                <p class="text-2xl font-extrabold text-green-900">2,738</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Gender Trend Analysis -->
+        <div data-aos="fade-up" data-aos-duration="1000">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    <i class="fas fa-chart-line mr-3"></i>Gender-wise Trend Analysis
+                </h2>
+                <div class="flow-line w-36 mx-auto mb-6"></div>
+            </div>
+            <div class="card" data-aos="slide-up" data-aos-delay="200">
+                <p class="text-slate-700 leading-relaxed">
+                    Out of the <strong>2,966</strong> applicants for the premier sections, approximately <strong>9.2%</strong> were female runners. This analysis explores how that distribution is reflected in the final, verified lineup sections.
+                </p>
+                <ul class="list-disc list-inside mt-4 space-y-2 text-slate-600">
+                    <li><strong>Overall Ratio:</strong> The marathon has a strong male participation, with roughly 10 male runners for every 1 female runner in these specific lineup requests.</li>
+                    <li><strong>Elite Section:</strong> Female runners make up about <strong>9.4%</strong> of the Elite section (13 out of 139), which is very close to their overall representation in the applicant pool.</li>
+                    <li><strong>Section A:</strong> This section sees a slightly lower female representation at about <strong>6.0%</strong> (50 out of 828). This is the lowest percentage among the verified groups.</li>
+                    <li><strong>Section B:</strong> Female runners are most represented here, comprising about <strong>10.6%</strong> of the group (188 out of 1771), slightly higher than their overall average.</li>
+                    <li><strong>Section C (Moved):</strong> Runners who were moved to Section C due to verification issues included about <strong>10.1%</strong> females (23 out of 228), which aligns with the general distribution.</li>
+                </ul>
+                <p class="mt-4 text-slate-800 font-semibold">
+                    Conclusion: The gender distribution across the final lineup sections is largely proportional to the initial applicant pool, with a minor dip in female representation in Section A and a slight increase in Section B.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Initialize AOS (Animate On Scroll)
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true,
+                offset: 100
+            });
+        });
+
+        // Scroll Progress Indicator
+        window.addEventListener('scroll', function() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollProgress = (scrollTop / scrollHeight) * 100;
+            document.getElementById('scrollProgress').style.width = scrollProgress + '%';
+        });
+
+        // Enhanced Data for charts with gradients
+        const lineupData = {
+            labels: ['Elite', 'Section A', 'Section B', 'Moved to C'],
+            datasets: [{
+                label: 'Number of Runners',
+                data: [139, 828, 1771, 228],
+                backgroundColor: [
+                    'rgba(245, 158, 11, 0.8)', // amber-500
+                    'rgba(59, 130, 246, 0.8)', // blue-500
+                    'rgba(16, 185, 129, 0.8)', // emerald-500
+                    'rgba(239, 68, 68, 0.8)'   // red-500
+                ],
+                borderColor: [
+                    '#f59e0b',
+                    '#3b82f6',
+                    '#10b981',
+                    '#ef4444'
+                ],
+                borderWidth: 3,
+                hoverOffset: 15,
+                hoverBorderWidth: 4
+            }]
+        };
+
+        const genderData = {
+            labels: ['Elite', 'Section A', 'Section B', 'Section C'],
+            datasets: [
+                {
+                    label: 'Male',
+                    data: [126, 778, 1583, 205],
+                    backgroundColor: 'rgba(96, 165, 250, 0.8)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Female',
+                    data: [13, 50, 188, 23],
+                    backgroundColor: 'rgba(244, 114, 182, 0.8)',
+                    borderColor: '#ec4899',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }
+            ]
+        };
+
+        // Enhanced Chart configurations
+        const lineupConfig = {
+            type: 'doughnut',
+            data: lineupData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1) + '%';
+                                    label += `${context.raw.toLocaleString()} runners (${percentage})`;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                },
+                cutout: '60%'
+            },
+        };
+
+        const genderConfig = {
+            type: 'bar',
+            data: genderData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'rect'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw.toLocaleString()} runners`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            },
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Runners',
+                            font: {
+                                size: 14,
+                                weight: '600'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            },
+        };
+
+        // Counter Animation Function
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= target) {
+                    element.textContent = target.toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(start).toLocaleString();
+                }
+            }, 16);
+        }
+
+        // Intersection Observer for counter animations
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.pulse-animation');
+                    counters.forEach(counter => {
+                        const target = parseInt(counter.textContent.replace(/,/g, ''));
+                        counter.textContent = '0';
+                        animateCounter(counter, target);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Loading and Chart Rendering
+        window.addEventListener('load', function() {
+            // Observe metric cards for counter animation
+            document.querySelectorAll('.metric-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // Render charts with delay for better UX
+            setTimeout(() => {
+                const lineupCtx = document.getElementById('lineupChart').getContext('2d');
+                new Chart(lineupCtx, lineupConfig);
+
+                const genderCtx = document.getElementById('genderChart').getContext('2d');
+                new Chart(genderCtx, genderConfig);
+            }, 500);
+
+            // Add loading skeleton removal
+            document.querySelectorAll('.loading-skeleton').forEach(skeleton => {
+                skeleton.classList.remove('loading-skeleton');
+            });
+        });
+
+        // Smooth scrolling for any anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add resize handler for responsive charts
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                Chart.helpers.each(Chart.instances, (instance) => {
+                    instance.resize();
+                });
+            }, 100);
+        });
+
+        // Performance optimization: Lazy load heavy content
+        if ('IntersectionObserver' in window) {
+            const lazyElements = document.querySelectorAll('[data-aos]');
+            const lazyObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('aos-animate');
+                    }
+                });
+            });
+
+            lazyElements.forEach(element => {
+                lazyObserver.observe(element);
+            });
+        }
+    </script>
+
+</body>
+</html>
