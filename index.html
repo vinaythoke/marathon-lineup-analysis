@@ -36,19 +36,19 @@
         }
 
         .glass-morphism {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(30px);
             border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
             padding: 1.5rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -126,19 +126,22 @@
 
         th,
         td {
-            padding: 1rem;
+            padding: 0.875rem 1rem;
             text-align: left;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.3);
             transition: background-color 0.2s ease;
+            font-size: 0.95rem;
         }
 
         th {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            font-weight: 600;
-            color: #334155;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            font-weight: 700;
+            color: #ffffff;
             position: sticky;
             top: 0;
             z-index: 10;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         tbody tr:hover {
@@ -275,13 +278,17 @@
             }
 
             .card {
-                padding: 1rem;
+                padding: 1.25rem;
             }
 
             th,
             td {
-                padding: 0.5rem;
-                font-size: 0.875rem;
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .card h3 {
+                font-size: 1rem;
             }
         }
 
@@ -370,12 +377,12 @@
                 </h2>
                 <div class="flow-line w-24 mx-auto mb-6"></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Table 1 -->
                 <div class="card" data-aos="zoom-in" data-aos-delay="100">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-users text-blue-500 mr-2"></i>
-                        <h3 class="font-bold text-slate-700">1. Total Applicants</h3>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-users text-blue-600 mr-3 text-lg"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">1. Total Applicants</h3>
                     </div>
                     <div class="table-container">
                         <table>
@@ -389,10 +396,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-medium">Dataset</td>
-                                    <td class="text-blue-600 font-semibold">2,692</td>
-                                    <td class="text-pink-600 font-semibold">274</td>
-                                    <td class="text-slate-800 font-bold">2,966</td>
+                                    <td class="font-semibold text-slate-800">Dataset</td>
+                                    <td class="text-blue-700 font-bold">2,692</td>
+                                    <td class="text-pink-700 font-bold">274</td>
+                                    <td class="text-slate-900 font-black">2,966</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -400,9 +407,9 @@
                 </div>
                 <!-- Table 2 -->
                 <div class="card" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                        <h3 class="font-bold text-slate-700">2. Auto Verified</h3>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-check-circle text-green-600 mr-3 text-lg"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">2. Auto Verified</h3>
                     </div>
                     <div class="table-container">
                         <table>
@@ -416,10 +423,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-medium">Verified</td>
-                                    <td class="text-blue-600 font-semibold">2,267</td>
-                                    <td class="text-pink-600 font-semibold">228</td>
-                                    <td class="text-slate-800 font-bold">2,495</td>
+                                    <td class="font-semibold text-slate-800">Verified</td>
+                                    <td class="text-blue-700 font-bold">2,267</td>
+                                    <td class="text-pink-700 font-bold">228</td>
+                                    <td class="text-slate-900 font-black">2,495</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -427,9 +434,9 @@
                 </div>
                 <!-- Table 3 -->
                 <div class="card" data-aos="zoom-in" data-aos-delay="300">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-times-circle text-red-500 mr-2"></i>
-                        <h3 class="font-bold text-slate-700">3. Failed Verification</h3>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-times-circle text-red-600 mr-3 text-lg"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">3. Failed Verification</h3>
                     </div>
                     <div class="table-container">
                         <table>
@@ -443,10 +450,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-medium">Failed</td>
-                                    <td class="text-blue-600 font-semibold">425</td>
-                                    <td class="text-pink-600 font-semibold">46</td>
-                                    <td class="text-slate-800 font-bold">471</td>
+                                    <td class="font-semibold text-slate-800">Failed</td>
+                                    <td class="text-blue-700 font-bold">425</td>
+                                    <td class="text-pink-700 font-bold">46</td>
+                                    <td class="text-slate-900 font-black">471</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -454,9 +461,9 @@
                 </div>
                 <!-- Table 4 -->
                 <div class="card" data-aos="zoom-in" data-aos-delay="400">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-crown text-amber-500 mr-2"></i>
-                        <h3 class="font-bold text-slate-700">4. Final: Section 'Elite'</h3>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-crown text-amber-600 mr-3 text-lg"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">4. Final: Section 'Elite'</h3>
                     </div>
                     <div class="table-container">
                         <table>
@@ -470,10 +477,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-medium">Elite</td>
-                                    <td class="text-blue-600 font-semibold">126</td>
-                                    <td class="text-pink-600 font-semibold">13</td>
-                                    <td class="text-slate-800 font-bold">139</td>
+                                    <td class="font-semibold text-slate-800">Elite</td>
+                                    <td class="text-blue-700 font-bold">126</td>
+                                    <td class="text-pink-700 font-bold">13</td>
+                                    <td class="text-slate-900 font-black">139</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -481,9 +488,9 @@
                 </div>
                 <!-- Table 5 -->
                 <div class="card" data-aos="zoom-in" data-aos-delay="500">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-medal text-blue-500 mr-2"></i>
-                        <h3 class="font-bold text-slate-700">5. Final: Section 'A'</h3>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-medal text-blue-600 mr-3 text-lg"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">5. Final: Section 'A'</h3>
                     </div>
                     <div class="table-container">
                         <table>
@@ -497,10 +504,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-medium">Section A</td>
-                                    <td class="text-blue-600 font-semibold">778</td>
-                                    <td class="text-pink-600 font-semibold">50</td>
-                                    <td class="text-slate-800 font-bold">828</td>
+                                    <td class="font-semibold text-slate-800">Section A</td>
+                                    <td class="text-blue-700 font-bold">778</td>
+                                    <td class="text-pink-700 font-bold">50</td>
+                                    <td class="text-slate-900 font-black">828</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -508,9 +515,9 @@
                 </div>
                 <!-- Table 6 -->
                 <div class="card" data-aos="zoom-in" data-aos-delay="600">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-award text-emerald-500 mr-2"></i>
-                        <h3 class="font-bold text-slate-700">6. Final: Section 'B'</h3>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-award text-emerald-600 mr-3 text-lg"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">6. Final: Section 'B'</h3>
                     </div>
                     <div class="table-container">
                         <table>
@@ -524,10 +531,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-medium">Section B</td>
-                                    <td class="text-blue-600 font-semibold">1,583</td>
-                                    <td class="text-pink-600 font-semibold">188</td>
-                                    <td class="text-slate-800 font-bold">1,771</td>
+                                    <td class="font-semibold text-slate-800">Section B</td>
+                                    <td class="text-blue-700 font-bold">1,583</td>
+                                    <td class="text-pink-700 font-bold">188</td>
+                                    <td class="text-slate-900 font-black">1,771</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -535,9 +542,9 @@
                 </div>
                 <!-- Table 7 -->
                 <div class="card" data-aos="zoom-in" data-aos-delay="700">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-arrow-right text-orange-500 mr-2"></i>
-                        <h3 class="font-bold text-slate-700">7. Moved to Section 'C'</h3>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-arrow-right text-orange-600 mr-3 text-lg"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">7. Moved to Section 'C'</h3>
                     </div>
                     <div class="table-container">
                         <table>
@@ -551,10 +558,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-medium">Section C</td>
-                                    <td class="text-blue-600 font-semibold">205</td>
-                                    <td class="text-pink-600 font-semibold">23</td>
-                                    <td class="text-slate-800 font-bold">228</td>
+                                    <td class="font-semibold text-slate-800">Section C</td>
+                                    <td class="text-blue-700 font-bold">205</td>
+                                    <td class="text-pink-700 font-bold">23</td>
+                                    <td class="text-slate-900 font-black">228</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -562,9 +569,9 @@
                 </div>
                 <!-- Table 8 -->
                 <div class="card" data-aos="zoom-in" data-aos-delay="800">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-user-check text-purple-500 mr-2"></i>
-                        <h3 class="font-bold text-slate-700">8. Manual Verification</h3>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-user-check text-purple-600 mr-3 text-lg"></i>
+                        <h3 class="font-bold text-slate-800 text-lg">8. Manual Verification</h3>
                     </div>
                     <div class="table-container">
                         <table>
@@ -578,10 +585,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="font-medium">Manual OK</td>
-                                    <td class="text-blue-600 font-semibold">220</td>
-                                    <td class="text-pink-600 font-semibold">23</td>
-                                    <td class="text-slate-800 font-bold">243</td>
+                                    <td class="font-semibold text-slate-800">Manual OK</td>
+                                    <td class="text-blue-700 font-bold">220</td>
+                                    <td class="text-pink-700 font-bold">23</td>
+                                    <td class="text-slate-900 font-black">243</td>
                                 </tr>
                             </tbody>
                         </table>
